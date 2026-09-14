@@ -1,0 +1,1021 @@
+openapi: 3.0.3
+info:
+  title: Selfsignal
+  version: 0.1.0
+  description: Consumer-controlled identity and purpose-bound consent rail for GDPR-safe behavioural advertising.
+  x-product-slug: ai-decentralized-selfsignal
+  x-source: ai-in-decentralized+ai/presentation7faktorgdpruvtwente2017-171011113026/
+servers:
+- url: https://api.example.com
+tags:
+- name: VaultProfiles
+  description: Person-controlled profiles
+- name: ConsentGrants
+  description: Purpose-bound grants
+- name: SignalActivations
+  description: Real-time grant checks
+- name: RightsRequests
+  description: GDPR consumer rights desk
+- name: Integrations
+  description: Publisher and brand processors
+- name: ComplaintCases
+  description: Supervisory complaint files
+paths:
+  /v1/vault-profiles:
+    get:
+      operationId: listVaultProfiles
+      tags:
+      - VaultProfiles
+      summary: List VaultProfile
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeVaultProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createVaultProfile
+      tags:
+      - VaultProfiles
+      summary: Create VaultProfile
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VaultProfileCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeVaultProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/vault-profiles/{personId}:
+    parameters:
+    - $ref: '#/components/parameters/PersonId'
+    get:
+      operationId: getVaultProfile
+      tags:
+      - VaultProfiles
+      summary: Get VaultProfile
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeVaultProfile'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/consent-grants:
+    get:
+      operationId: listConsentGrants
+      tags:
+      - ConsentGrants
+      summary: List ConsentGrant
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeConsentGrant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createConsentGrant
+      tags:
+      - ConsentGrants
+      summary: Create ConsentGrant
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentGrantCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeConsentGrant'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/consent-grants/{grantId}:
+    parameters:
+    - $ref: '#/components/parameters/GrantId'
+    get:
+      operationId: getConsentGrant
+      tags:
+      - ConsentGrants
+      summary: Get ConsentGrant
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeConsentGrant'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/consent-grants/{grantId}/withdraw:
+    parameters:
+    - $ref: '#/components/parameters/GrantId'
+    post:
+      operationId: withdrawConsentGrant
+      tags:
+      - ConsentGrants
+      summary: Withdraw grant
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeConsentGrant'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /v1/signal-activations:
+    get:
+      operationId: listSignalActivations
+      tags:
+      - SignalActivations
+      summary: List SignalActivation
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeSignalActivation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: requestSignalActivation
+      tags:
+      - SignalActivations
+      summary: Create SignalActivation
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalActivationCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeSignalActivation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/signal-activations/{activationId}:
+    parameters:
+    - $ref: '#/components/parameters/ActivationId'
+    get:
+      operationId: getSignalActivation
+      tags:
+      - SignalActivations
+      summary: Get SignalActivation
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeSignalActivation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/rights-requests:
+    get:
+      operationId: listRightsRequests
+      tags:
+      - RightsRequests
+      summary: List RightsRequest
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeRightsRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createRightsRequest
+      tags:
+      - RightsRequests
+      summary: Create RightsRequest
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RightsRequestCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeRightsRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/rights-requests/{requestId}:
+    parameters:
+    - $ref: '#/components/parameters/RequestId'
+    get:
+      operationId: getRightsRequest
+      tags:
+      - RightsRequests
+      summary: Get RightsRequest
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeRightsRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/integrations:
+    get:
+      operationId: listIntegrations
+      tags:
+      - Integrations
+      summary: List Integration
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeIntegration'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: registerIntegration
+      tags:
+      - Integrations
+      summary: Create Integration
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeIntegration'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/integrations/{integrationId}:
+    parameters:
+    - $ref: '#/components/parameters/IntegrationId'
+    get:
+      operationId: getIntegration
+      tags:
+      - Integrations
+      summary: Get Integration
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeIntegration'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/complaint-cases:
+    get:
+      operationId: listComplaintCases
+      tags:
+      - ComplaintCases
+      summary: List ComplaintCase
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeComplaintCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: openComplaintCase
+      tags:
+      - ComplaintCases
+      summary: Create ComplaintCase
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComplaintCaseCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeComplaintCase'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/complaint-cases/{complaintId}:
+    parameters:
+    - $ref: '#/components/parameters/ComplaintId'
+    get:
+      operationId: getComplaintCase
+      tags:
+      - ComplaintCases
+      summary: Get ComplaintCase
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeComplaintCase'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    PersonId:
+      name: personId
+      in: path
+      required: true
+      schema:
+        type: string
+    GrantId:
+      name: grantId
+      in: path
+      required: true
+      schema:
+        type: string
+    ActivationId:
+      name: activationId
+      in: path
+      required: true
+      schema:
+        type: string
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+    IntegrationId:
+      name: integrationId
+      in: path
+      required: true
+      schema:
+        type: string
+    ComplaintId:
+      name: complaintId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    BadRequest:
+      description: Bad request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    ResponseMeta:
+      type: object
+      required:
+      - requestId
+      - timestamp
+      properties:
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required:
+      - type
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    VaultProfile:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: string
+        displayHandle:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - erasurePending
+          - erased
+        locale:
+          type: string
+    VaultProfileCreate:
+      type: object
+      required:
+      - locale
+      properties:
+        displayHandle:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - erasurePending
+          - erased
+        locale:
+          type: string
+    DataEnvelopeVaultProfile:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/VaultProfile'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeVaultProfile:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/VaultProfile'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ConsentGrant:
+      type: object
+      required:
+      - id
+      - personId
+      - purposeId
+      - controllerIntegrationId
+      - status
+      - expiresAt
+      properties:
+        id:
+          type: string
+        personId:
+          type: string
+        purposeId:
+          type: string
+        controllerIntegrationId:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - withdrawn
+          - expired
+        expiresAt:
+          type: string
+          format: date-time
+        signalClasses:
+          type: array
+          items:
+            type: string
+    ConsentGrantCreate:
+      type: object
+      required:
+      - personId
+      - purposeId
+      - controllerIntegrationId
+      - expiresAt
+      - signalClasses
+      properties:
+        personId:
+          type: string
+        purposeId:
+          type: string
+        controllerIntegrationId:
+          type: string
+        status:
+          type: string
+          enum:
+          - active
+          - withdrawn
+          - expired
+        expiresAt:
+          type: string
+          format: date-time
+        signalClasses:
+          type: array
+          items:
+            type: string
+    DataEnvelopeConsentGrant:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/ConsentGrant'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeConsentGrant:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsentGrant'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    SignalActivation:
+      type: object
+      required:
+      - id
+      - personId
+      - purposeId
+      - integrationId
+      - allowed
+      properties:
+        id:
+          type: string
+        personId:
+          type: string
+        purposeId:
+          type: string
+        integrationId:
+          type: string
+        allowed:
+          type: boolean
+        emittedSignals:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+    SignalActivationCreate:
+      type: object
+      required:
+      - personId
+      - purposeId
+      - integrationId
+      properties:
+        personId:
+          type: string
+        purposeId:
+          type: string
+        integrationId:
+          type: string
+        allowed:
+          type: boolean
+        emittedSignals:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+    DataEnvelopeSignalActivation:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/SignalActivation'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeSignalActivation:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/SignalActivation'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    RightsRequest:
+      type: object
+      required:
+      - id
+      - personId
+      - rightType
+      - status
+      properties:
+        id:
+          type: string
+        personId:
+          type: string
+        rightType:
+          type: string
+          enum:
+          - access
+          - rectification
+          - erasure
+          - portability
+          - complaint
+        status:
+          type: string
+          enum:
+          - open
+          - inProgress
+          - fulfilled
+          - rejected
+        dueAt:
+          type: string
+          format: date-time
+    RightsRequestCreate:
+      type: object
+      required:
+      - personId
+      - rightType
+      properties:
+        personId:
+          type: string
+        rightType:
+          type: string
+          enum:
+          - access
+          - rectification
+          - erasure
+          - portability
+          - complaint
+        status:
+          type: string
+          enum:
+          - open
+          - inProgress
+          - fulfilled
+          - rejected
+        dueAt:
+          type: string
+          format: date-time
+    DataEnvelopeRightsRequest:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/RightsRequest'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeRightsRequest:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/RightsRequest'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    Integration:
+      type: object
+      required:
+      - id
+      - name
+      - role
+      - status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+          - controller
+          - processor
+        status:
+          type: string
+          enum:
+          - active
+          - suspended
+        partyType:
+          type: string
+          enum:
+          - publisher
+          - brand
+          - vendor
+    IntegrationCreate:
+      type: object
+      required:
+      - name
+      - role
+      - status
+      properties:
+        name:
+          type: string
+        role:
+          type: string
+          enum:
+          - controller
+          - processor
+        status:
+          type: string
+          enum:
+          - active
+          - suspended
+        partyType:
+          type: string
+          enum:
+          - publisher
+          - brand
+          - vendor
+    DataEnvelopeIntegration:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/Integration'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeIntegration:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Integration'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ComplaintCase:
+      type: object
+      required:
+      - id
+      - personId
+      - status
+      - summary
+      properties:
+        id:
+          type: string
+        personId:
+          type: string
+        status:
+          type: string
+          enum:
+          - open
+          - escalated
+          - closed
+        summary:
+          type: string
+        authorityRef:
+          type: string
+    ComplaintCaseCreate:
+      type: object
+      required:
+      - personId
+      - summary
+      properties:
+        personId:
+          type: string
+        status:
+          type: string
+          enum:
+          - open
+          - escalated
+          - closed
+        summary:
+          type: string
+        authorityRef:
+          type: string
+    DataEnvelopeComplaintCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplaintCase'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeComplaintCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ComplaintCase'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
