@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: Vault Profiles API
+  version: 0.1.0
+  description: |
+    Consumer vault profiles — create, view, update, erase, data pack (BR-1).
+  x-domain: vpf
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: VaultProfiles
+    description: Person-controlled profiles
+paths:
+  /v1/vault-profiles:
+    get:
+      operationId: listVaultProfiles
+      tags: [VaultProfiles]
+      summary: List vault profiles
+      security:
+      - apiKey: []
+      - bearerJwt: []
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createVaultProfile
+      tags: [VaultProfiles]
+      summary: Create vault profile
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/vault-profiles/{personId}:
+    parameters:
+      - name: personId
+        in: path
+        required: true
+        schema:
+          $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileId
+    get:
+      operationId: getVaultProfile
+      tags: [VaultProfiles]
+      summary: Get vault profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    patch:
+      operationId: updateVaultProfile
+      tags: [VaultProfiles]
+      summary: Update vault profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileUpdate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/vault-profiles/{personId}/erase:
+    parameters:
+      - name: personId
+        in: path
+        required: true
+        schema:
+          $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileId
+    post:
+      operationId: eraseVaultProfile
+      tags: [VaultProfiles]
+      summary: Request erasure of vault profile
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          description: Erasure accepted
+          content:
+            application/json:
+              schema:
+                $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/vault-profiles/{personId}/data-pack:
+    parameters:
+      - name: personId
+        in: path
+        required: true
+        schema:
+          $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultProfileId
+    get:
+      operationId: downloadVaultDataPack
+      tags: [VaultProfiles]
+      summary: Download portability data pack
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./vault-profiles.schemas.yaml#/components/schemas/VaultDataPackResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

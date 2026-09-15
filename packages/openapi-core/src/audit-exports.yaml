@@ -1,0 +1,165 @@
+openapi: 3.1.0
+info:
+  title: Audit Exports API
+  version: 0.1.0
+  description: |
+    Consent artefact export and public attestation (BR-11).
+  x-domain: aud
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: AuditExports
+    description: Regulatory audit packs
+paths:
+  /v1/audit-exports:
+    get:
+      operationId: listAuditExports
+      tags: [AuditExports]
+      summary: List audit exports
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createAuditExport
+      tags: [AuditExports]
+      summary: Create audit export pack
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/audit-exports/{exportId}:
+    parameters:
+      - name: exportId
+        in: path
+        required: true
+        schema:
+          $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportId
+    get:
+      operationId: getAuditExport
+      tags: [AuditExports]
+      summary: Get audit export
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/audit-exports/{exportId}/verify:
+    parameters:
+      - name: exportId
+        in: path
+        required: true
+        schema:
+          $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportId
+    post:
+      operationId: verifyAuditExport
+      tags: [AuditExports]
+      summary: Verify audit pack hash
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditAttestationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/public/attestations/{exportId}:
+    parameters:
+      - name: exportId
+        in: path
+        required: true
+        schema:
+          $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditExportId
+    get:
+      operationId: getPublicAttestation
+      tags: [AuditExports]
+      summary: Public read-only attestation viewer
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./audit-exports.schemas.yaml#/components/schemas/AuditAttestationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

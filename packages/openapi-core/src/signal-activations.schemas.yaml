@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: Signal activation schemas
+  version: 0.1.0
+  description: |
+    Real-time grant checks and minimised signal emission.
+paths: {}
+components:
+  schemas:
+
+    SignalActivationId:
+      type: string
+      pattern: '^act_[0-9A-HJKMNP-TV-Z]{26}$'
+    ActivationMode:
+      type: string
+      enum: [deterministic, probabilistic]
+    SignalActivation:
+      type: object
+      required: [id, personId, purposeId, integrationId, allowed, mode, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/SignalActivationId'
+        personId:
+          type: string
+        purposeId:
+          type: string
+        integrationId:
+          type: string
+        allowed:
+          type: boolean
+        mode:
+          $ref: '#/components/schemas/ActivationMode'
+        emittedSignals:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+        failureCode:
+          type: string
+          enum: [noGrant, expired, withdrawn, childBlock, specialCategoryBlock, campaignBlocked]
+        bidstreamTokenStatus:
+          type: string
+          enum: [issued, suppressed, expired]
+        withdrawalSlaMs:
+          type: integer
+          description: Target propagation SLA for withdrawals.
+        createdAt:
+          type: string
+          format: date-time
+    SignalActivationRequest:
+      type: object
+      required: [personId, purposeId, integrationId]
+      properties:
+        personId:
+          type: string
+        purposeId:
+          type: string
+        integrationId:
+          type: string
+        preferMode:
+          $ref: '#/components/schemas/ActivationMode'
+    SignalActivationReplay:
+      type: object
+      properties:
+        note:
+          type: string
+    SignalActivationResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/SignalActivation'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    SignalActivationListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SignalActivation'
+        nextCursor:
+          type: string
+    SignalActivationListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/SignalActivationListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

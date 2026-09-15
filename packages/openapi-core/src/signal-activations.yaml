@@ -1,0 +1,152 @@
+openapi: 3.1.0
+info:
+  title: Signal Activations API
+  version: 0.1.0
+  description: |
+    Real-time grant check and signal emission (BR-3, BR-6).
+  x-domain: act
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: SignalActivations
+    description: Real-time grant checks
+paths:
+  /v1/signal-activations:
+    get:
+      operationId: listSignalActivations
+      tags: [SignalActivations]
+      summary: List signal activations
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      - name: personId
+        in: query
+        schema:
+          type: string
+      - name: allowed
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: requestSignalActivation
+      tags: [SignalActivations]
+      summary: Request signal activation
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/signal-activations/{activationId}:
+    parameters:
+      - name: activationId
+        in: path
+        required: true
+        schema:
+          $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationId
+    get:
+      operationId: getSignalActivation
+      tags: [SignalActivations]
+      summary: Get signal activation
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/signal-activations/{activationId}/replay:
+    parameters:
+      - name: activationId
+        in: path
+        required: true
+        schema:
+          $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationId
+    post:
+      operationId: replaySignalActivation
+      tags: [SignalActivations]
+      summary: Replay activation test
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationReplay
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./signal-activations.schemas.yaml#/components/schemas/SignalActivationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

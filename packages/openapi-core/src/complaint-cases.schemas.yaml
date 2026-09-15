@@ -1,0 +1,110 @@
+openapi: 3.1.0
+info:
+  title: Complaint case schemas
+  version: 0.1.0
+  description: |
+    Supervisory complaint files.
+paths: {}
+components:
+  schemas:
+
+    ComplaintCaseId:
+      type: string
+      pattern: '^cpc_[0-9A-HJKMNP-TV-Z]{26}$'
+    ComplaintCaseStatus:
+      type: string
+      enum: [open, escalated, closed]
+    ComplaintCase:
+      type: object
+      required: [id, personId, status, summary, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/ComplaintCaseId'
+        personId:
+          type: string
+        status:
+          $ref: '#/components/schemas/ComplaintCaseStatus'
+        summary:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        authorityRef:
+          type: string
+        linkedGrantIds:
+          type: array
+          items:
+            type: string
+        linkedActivationIds:
+          type: array
+          items:
+            type: string
+        dueAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    ComplaintCaseCreate:
+      type: object
+      required: [personId, summary]
+      properties:
+        personId:
+          type: string
+        summary:
+          type: string
+        linkedGrantIds:
+          type: array
+          items:
+            type: string
+        linkedActivationIds:
+          type: array
+          items:
+            type: string
+    ComplaintCaseEscalate:
+      type: object
+      properties:
+        authorityRef:
+          type: string
+        notes:
+          type: string
+    ComplaintCaseClose:
+      type: object
+      properties:
+        resolution:
+          type: string
+    ComplaintCaseResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplaintCase'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    ComplaintCaseListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplaintCase'
+        nextCursor:
+          type: string
+    ComplaintCaseListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ComplaintCaseListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

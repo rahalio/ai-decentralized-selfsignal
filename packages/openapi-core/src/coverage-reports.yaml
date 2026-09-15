@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: Coverage Reports API
+  version: 0.1.0
+  description: |
+    Yield vs contextual and fine-risk dashboards (BR-7, BR-9).
+  x-domain: cvr
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: CoverageReports
+    description: Yield and fine-risk coverage
+paths:
+  /v1/coverage-reports:
+    get:
+      operationId: listCoverageReports
+      tags: [CoverageReports]
+      summary: List coverage reports
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./coverage-reports.schemas.yaml#/components/schemas/CoverageReportListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createCoverageReport
+      tags: [CoverageReports]
+      summary: Generate coverage report for a period
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./coverage-reports.schemas.yaml#/components/schemas/CoverageReportCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./coverage-reports.schemas.yaml#/components/schemas/CoverageReportResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/coverage-reports/{reportId}:
+    parameters:
+      - name: reportId
+        in: path
+        required: true
+        schema:
+          $ref: ./coverage-reports.schemas.yaml#/components/schemas/CoverageReportId
+    get:
+      operationId: getCoverageReport
+      tags: [CoverageReports]
+      summary: Get coverage report
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./coverage-reports.schemas.yaml#/components/schemas/CoverageReportResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/coverage-reports/latest:
+    get:
+      operationId: getLatestCoverageReport
+      tags: [CoverageReports]
+      summary: Get latest coverage snapshot
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./coverage-reports.schemas.yaml#/components/schemas/CoverageReportResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

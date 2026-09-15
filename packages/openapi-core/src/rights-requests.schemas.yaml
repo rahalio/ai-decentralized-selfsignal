@@ -1,0 +1,94 @@
+openapi: 3.1.0
+info:
+  title: Rights request schemas
+  version: 0.1.0
+  description: |
+    GDPR rights desk.
+paths: {}
+components:
+  schemas:
+
+    RightsRequestId:
+      type: string
+      pattern: '^rrq_[0-9A-HJKMNP-TV-Z]{26}$'
+    RightType:
+      type: string
+      enum: [access, rectification, erasure, portability, complaint]
+    RightsRequestStatus:
+      type: string
+      enum: [open, inProgress, fulfilled, rejected]
+    RightsRequest:
+      type: object
+      required: [id, personId, rightType, status, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/RightsRequestId'
+        personId:
+          type: string
+        rightType:
+          $ref: '#/components/schemas/RightType'
+        status:
+          $ref: '#/components/schemas/RightsRequestStatus'
+        dueAt:
+          type: string
+          format: date-time
+        fulfilledAt:
+          type: string
+          format: date-time
+        evidencePackHash:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    RightsRequestCreate:
+      type: object
+      required: [personId, rightType]
+      properties:
+        personId:
+          type: string
+        rightType:
+          $ref: '#/components/schemas/RightType'
+        notes:
+          type: string
+    RightsRequestFulfil:
+      type: object
+      properties:
+        evidencePackHash:
+          type: string
+        notes:
+          type: string
+    RightsRequestResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/RightsRequest'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    RightsRequestListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RightsRequest'
+        nextCursor:
+          type: string
+    RightsRequestListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/RightsRequestListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

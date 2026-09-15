@@ -1,0 +1,114 @@
+openapi: 3.1.0
+info:
+  title: Purpose schemas
+  version: 0.1.0
+  description: |
+    Purpose catalog for purpose-bound grants and campaigns.
+paths: {}
+components:
+  schemas:
+
+    PurposeId:
+      type: string
+      pattern: '^pur_[0-9A-HJKMNP-TV-Z]{26}$'
+    PurposeStatus:
+      type: string
+      enum: [active, retired]
+    SignalClass:
+      type: string
+      enum: [intent, demographic, contextual, engagement, suppression]
+    Purpose:
+      type: object
+      required: [id, name, status, signalClasses, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/PurposeId'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+        status:
+          $ref: '#/components/schemas/PurposeStatus'
+        signalClasses:
+          type: array
+          items:
+            $ref: '#/components/schemas/SignalClass'
+          minItems: 1
+        riskTier:
+          type: string
+          enum: [standard, elevated, specialCategory]
+        badgeLabel:
+          type: string
+          description: UI badge text for purpose audiences.
+        createdAt:
+          type: string
+          format: date-time
+    PurposeCreate:
+      type: object
+      required: [name, signalClasses]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 2000
+        signalClasses:
+          type: array
+          items:
+            $ref: '#/components/schemas/SignalClass'
+          minItems: 1
+        riskTier:
+          type: string
+          enum: [standard, elevated, specialCategory]
+          default: standard
+        badgeLabel:
+          type: string
+    PurposeUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/PurposeStatus'
+        badgeLabel:
+          type: string
+    PurposeResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Purpose'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    PurposeListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purpose'
+        nextCursor:
+          type: string
+    PurposeListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/PurposeListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

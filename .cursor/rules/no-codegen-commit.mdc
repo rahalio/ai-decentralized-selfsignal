@@ -1,0 +1,13 @@
+---
+description: Never commit or push the local .codegen directory
+alwaysApply: true
+---
+
+# No `.codegen` in Git
+
+`.codegen/` is a **local-only** codegen toolchain directory.
+
+- Never `git add`, commit, or push `.codegen/` (or nested `zero_codegen` tool trees).
+- `.gitignore` must keep `.codegen/` ignored.
+- Bootstrap locally by copying from `zero-apps-codegen-scaffold/.codegen/`, then run `pnpm codegen:paths` and ensure `package_scope` is `@selfsignal`.
+- Do not document workarounds that force-add `.codegen` with `-f` / `--force`.

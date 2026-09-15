@@ -1,0 +1,102 @@
+openapi: 3.1.0
+info:
+  title: Integration schemas
+  version: 0.1.0
+  description: |
+    Processor/controller registry.
+paths: {}
+components:
+  schemas:
+
+    IntegrationId:
+      type: string
+      pattern: '^int_[0-9A-HJKMNP-TV-Z]{26}$'
+    IntegrationRole:
+      type: string
+      enum: [controller, processor]
+    IntegrationStatus:
+      type: string
+      enum: [active, suspended]
+    PartyType:
+      type: string
+      enum: [publisher, brand, vendor]
+    Integration:
+      type: object
+      required: [id, name, role, status, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/IntegrationId'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        role:
+          $ref: '#/components/schemas/IntegrationRole'
+        status:
+          $ref: '#/components/schemas/IntegrationStatus'
+        partyType:
+          $ref: '#/components/schemas/PartyType'
+        dpaOnFile:
+          type: boolean
+        purposeIds:
+          type: array
+          items:
+            type: string
+        gapFlags:
+          type: array
+          items:
+            type: string
+            enum: [missingDpa, missingPurpose, suspendedPartner]
+        createdAt:
+          type: string
+          format: date-time
+    IntegrationCreate:
+      type: object
+      required: [name, role]
+      properties:
+        name:
+          type: string
+        role:
+          $ref: '#/components/schemas/IntegrationRole'
+        partyType:
+          $ref: '#/components/schemas/PartyType'
+        dpaOnFile:
+          type: boolean
+          default: false
+        purposeIds:
+          type: array
+          items:
+            type: string
+    IntegrationResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Integration'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    IntegrationListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Integration'
+        nextCursor:
+          type: string
+    IntegrationListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/IntegrationListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

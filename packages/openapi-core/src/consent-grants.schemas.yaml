@@ -1,0 +1,108 @@
+openapi: 3.1.0
+info:
+  title: Consent grant schemas
+  version: 0.1.0
+  description: |
+    Purpose-bound, time-bound consent grants.
+paths: {}
+components:
+  schemas:
+
+    ConsentGrantId:
+      type: string
+      pattern: '^cgr_[0-9A-HJKMNP-TV-Z]{26}$'
+    ConsentGrantStatus:
+      type: string
+      enum: [active, withdrawn, expired]
+    ConsentGrant:
+      type: object
+      required: [id, personId, purposeId, controllerIntegrationId, status, signalClasses, expiresAt, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/ConsentGrantId'
+        personId:
+          type: string
+        purposeId:
+          type: string
+        controllerIntegrationId:
+          type: string
+        status:
+          $ref: '#/components/schemas/ConsentGrantStatus'
+        signalClasses:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        expiresAt:
+          type: string
+          format: date-time
+        withdrawnAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    ConsentGrantCreate:
+      type: object
+      required: [personId, purposeId, controllerIntegrationId, signalClasses, expiresAt]
+      properties:
+        personId:
+          type: string
+        purposeId:
+          type: string
+        controllerIntegrationId:
+          type: string
+        signalClasses:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        expiresAt:
+          type: string
+          format: date-time
+    ConsentGrantRenew:
+      type: object
+      required: [expiresAt]
+      properties:
+        expiresAt:
+          type: string
+          format: date-time
+    ConsentGrantWithdraw:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+    ConsentGrantResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ConsentGrant'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    ConsentGrantListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentGrant'
+        nextCursor:
+          type: string
+    ConsentGrantListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ConsentGrantListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

@@ -1,0 +1,183 @@
+openapi: 3.1.0
+info:
+  title: Complaint Cases API
+  version: 0.1.0
+  description: |
+    Supervisory complaint files with DPO escalation (BR-12).
+  x-domain: cpc
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: ComplaintCases
+    description: Supervisory complaint files
+paths:
+  /v1/complaint-cases:
+    get:
+      operationId: listComplaintCases
+      tags: [ComplaintCases]
+      summary: List complaint cases
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [open, escalated, closed]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: openComplaintCase
+      tags: [ComplaintCases]
+      summary: Open complaint case
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/complaint-cases/{complaintId}:
+    parameters:
+      - name: complaintId
+        in: path
+        required: true
+        schema:
+          $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseId
+    get:
+      operationId: getComplaintCase
+      tags: [ComplaintCases]
+      summary: Get complaint case
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/complaint-cases/{complaintId}/escalate:
+    parameters:
+      - name: complaintId
+        in: path
+        required: true
+        schema:
+          $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseId
+    post:
+      operationId: escalateComplaintCase
+      tags: [ComplaintCases]
+      summary: Escalate complaint to DPO / authority
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseEscalate
+      responses:
+        '200':
+          description: Escalated
+          content:
+            application/json:
+              schema:
+                $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/complaint-cases/{complaintId}/close:
+    parameters:
+      - name: complaintId
+        in: path
+        required: true
+        schema:
+          $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseId
+    post:
+      operationId: closeComplaintCase
+      tags: [ComplaintCases]
+      summary: Close complaint case
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseClose
+      responses:
+        '200':
+          description: Closed
+          content:
+            application/json:
+              schema:
+                $ref: ./complaint-cases.schemas.yaml#/components/schemas/ComplaintCaseResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: Coverage report schemas
+  version: 0.1.0
+  description: |
+    Yield vs contextual and fine-risk coverage.
+paths: {}
+components:
+  schemas:
+
+    CoverageReportId:
+      type: string
+      pattern: '^cvr_[0-9A-HJKMNP-TV-Z]{26}$'
+    CoverageReport:
+      type: object
+      required: [id, periodStart, periodEnd, consentedRpm, contextualRpm, coveragePct, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/CoverageReportId'
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        consentedRpm:
+          type: number
+        contextualRpm:
+          type: number
+        coveragePct:
+          type: number
+          minimum: 0
+          maximum: 100
+        withdrawalLatencyP50Ms:
+          type: integer
+        expiredGrantCount:
+          type: integer
+        specialCategoryBlockRate:
+          type: number
+        purposeHeat:
+          type: array
+          items:
+            type: object
+            required: [purposeId, coveragePct, fineRiskScore]
+            properties:
+              purposeId:
+                type: string
+              coveragePct:
+                type: number
+              fineRiskScore:
+                type: number
+              expiredGrants:
+                type: integer
+        createdAt:
+          type: string
+          format: date-time
+    CoverageReportCreate:
+      type: object
+      required: [periodStart, periodEnd]
+      properties:
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        integrationId:
+          type: string
+    CoverageReportResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/CoverageReport'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    CoverageReportListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageReport'
+        nextCursor:
+          type: string
+    CoverageReportListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/CoverageReportListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

@@ -1,0 +1,134 @@
+openapi: 3.1.0
+info:
+  title: Vault profile schemas
+  version: 0.1.0
+  description: |
+    Person-controlled vault profiles.
+paths: {}
+components:
+  schemas:
+
+    VaultProfileId:
+      type: string
+      pattern: '^vpf_[0-9A-HJKMNP-TV-Z]{26}$'
+    VaultProfileStatus:
+      type: string
+      enum: [active, erasurePending, erased]
+    VaultProfile:
+      type: object
+      required: [id, status, locale, createdAt, updatedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/VaultProfileId'
+        displayHandle:
+          type: string
+          maxLength: 80
+        status:
+          $ref: '#/components/schemas/VaultProfileStatus'
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 16
+        childFlag:
+          type: boolean
+          description: When true, behavioural activation is hard-blocked (BR-8).
+        specialCategoryFlag:
+          type: boolean
+          description: Special-category data present — hard-block behavioural activation.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    VaultProfileCreate:
+      type: object
+      required: [locale]
+      properties:
+        displayHandle:
+          type: string
+          maxLength: 80
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 16
+        childFlag:
+          type: boolean
+          default: false
+        specialCategoryFlag:
+          type: boolean
+          default: false
+    VaultProfileUpdate:
+      type: object
+      properties:
+        displayHandle:
+          type: string
+          maxLength: 80
+        locale:
+          type: string
+          minLength: 2
+          maxLength: 16
+    VaultDataPack:
+      type: object
+      required: [personId, generatedAt, grants, rightsHistory]
+      properties:
+        personId:
+          $ref: '#/components/schemas/VaultProfileId'
+        generatedAt:
+          type: string
+          format: date-time
+        grants:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        rightsHistory:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        packHash:
+          type: string
+          description: SHA-256 hex of canonical pack bytes.
+    VaultProfileResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/VaultProfile'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    VaultDataPackResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/VaultDataPack'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    VaultProfileListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VaultProfile'
+        nextCursor:
+          type: string
+    VaultProfileListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/VaultProfileListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

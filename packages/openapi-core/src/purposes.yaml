@@ -1,0 +1,135 @@
+openapi: 3.1.0
+info:
+  title: Purposes API
+  version: 0.1.0
+  description: |
+    Purpose catalog — badges, signal classes, risk tiers.
+  x-domain: pur
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: Purposes
+    description: Purpose catalog
+paths:
+  /v1/purposes:
+    get:
+      operationId: listPurposes
+      tags: [Purposes]
+      summary: List purposes
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./purposes.schemas.yaml#/components/schemas/PurposeListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createPurpose
+      tags: [Purposes]
+      summary: Create purpose
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./purposes.schemas.yaml#/components/schemas/PurposeCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./purposes.schemas.yaml#/components/schemas/PurposeResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/purposes/{purposeId}:
+    parameters:
+      - name: purposeId
+        in: path
+        required: true
+        schema:
+          $ref: ./purposes.schemas.yaml#/components/schemas/PurposeId
+    get:
+      operationId: getPurpose
+      tags: [Purposes]
+      summary: Get purpose
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./purposes.schemas.yaml#/components/schemas/PurposeResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    patch:
+      operationId: updatePurpose
+      tags: [Purposes]
+      summary: Update purpose
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./purposes.schemas.yaml#/components/schemas/PurposeUpdate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./purposes.schemas.yaml#/components/schemas/PurposeResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: Audit export schemas
+  version: 0.1.0
+  description: |
+    Consent artefact packs and attestation.
+paths: {}
+components:
+  schemas:
+
+    AuditExportId:
+      type: string
+      pattern: '^aud_[0-9A-HJKMNP-TV-Z]{26}$'
+    AuditExportStatus:
+      type: string
+      enum: [pending, ready, failed]
+    AuditExport:
+      type: object
+      required: [id, periodStart, periodEnd, status, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/AuditExportId'
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/AuditExportStatus'
+        artefactChecklist:
+          type: array
+          items:
+            type: string
+        packHash:
+          type: string
+        attestationUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+        readyAt:
+          type: string
+          format: date-time
+    AuditExportCreate:
+      type: object
+      required: [periodStart, periodEnd]
+      properties:
+        periodStart:
+          type: string
+          format: date-time
+        periodEnd:
+          type: string
+          format: date-time
+        includeRights:
+          type: boolean
+          default: true
+        includeComplaints:
+          type: boolean
+          default: true
+    AuditAttestation:
+      type: object
+      required: [exportId, packHash, verified, generatedAt]
+      properties:
+        exportId:
+          $ref: '#/components/schemas/AuditExportId'
+        packHash:
+          type: string
+        verified:
+          type: boolean
+        generatedAt:
+          type: string
+          format: date-time
+        summary:
+          type: string
+    AuditExportResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AuditExport'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    AuditAttestationResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AuditAttestation'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    AuditExportListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditExport'
+        nextCursor:
+          type: string
+    AuditExportListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AuditExportListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

@@ -1,0 +1,118 @@
+openapi: 3.1.0
+info:
+  title: Campaign schemas
+  version: 0.1.0
+  description: |
+    Brand campaign compliance gate.
+paths: {}
+components:
+  schemas:
+
+    CampaignId:
+      type: string
+      pattern: '^cmp_[0-9A-HJKMNP-TV-Z]{26}$'
+    CampaignStatus:
+      type: string
+      enum: [draft, approved, blocked, live, ended]
+    Campaign:
+      type: object
+      required: [id, name, purposeId, status, fineRiskScore, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/CampaignId'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 160
+        purposeId:
+          type: string
+        brandIntegrationId:
+          type: string
+        status:
+          $ref: '#/components/schemas/CampaignStatus'
+        audienceCount:
+          type: integer
+          minimum: 0
+        grantedAudienceCount:
+          type: integer
+          minimum: 0
+        fineRiskScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        blockReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CampaignCreate:
+      type: object
+      required: [name, purposeId]
+      properties:
+        name:
+          type: string
+        purposeId:
+          type: string
+        brandIntegrationId:
+          type: string
+    CampaignGateResult:
+      type: object
+      required: [campaignId, allowed, fineRiskScore]
+      properties:
+        campaignId:
+          $ref: '#/components/schemas/CampaignId'
+        allowed:
+          type: boolean
+        fineRiskScore:
+          type: number
+        missingGrantCount:
+          type: integer
+        expiredGrantCount:
+          type: integer
+        blockReason:
+          type: string
+    CampaignResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Campaign'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    CampaignGateResultResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/CampaignGateResult'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    CampaignListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campaign'
+        nextCursor:
+          type: string
+    CampaignListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/CampaignListData'
+        meta:
+          allOf:
+            - $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+            - type: object
+              properties:
+                pagination:
+                  $ref: ./common/envelopes.yaml#/components/schemas/PageInfo
+

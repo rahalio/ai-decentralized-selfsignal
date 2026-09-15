@@ -1,0 +1,187 @@
+openapi: 3.1.0
+info:
+  title: Consent Grants API
+  version: 0.1.0
+  description: |
+    Purpose-bound grants — create, renew, withdraw (BR-2).
+  x-domain: cgr
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: ConsentGrants
+    description: Purpose-bound grants
+paths:
+  /v1/consent-grants:
+    get:
+      operationId: listConsentGrants
+      tags: [ConsentGrants]
+      summary: List consent grants
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      - name: personId
+        in: query
+        schema:
+          type: string
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum: [active, withdrawn, expired]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createConsentGrant
+      tags: [ConsentGrants]
+      summary: Create consent grant
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/consent-grants/{grantId}:
+    parameters:
+      - name: grantId
+        in: path
+        required: true
+        schema:
+          $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantId
+    get:
+      operationId: getConsentGrant
+      tags: [ConsentGrants]
+      summary: Get consent grant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/consent-grants/{grantId}/withdraw:
+    parameters:
+      - name: grantId
+        in: path
+        required: true
+        schema:
+          $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantId
+    post:
+      operationId: withdrawConsentGrant
+      tags: [ConsentGrants]
+      summary: Withdraw consent grant
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantWithdraw
+      responses:
+        '200':
+          description: Withdrawn
+          content:
+            application/json:
+              schema:
+                $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/consent-grants/{grantId}/renew:
+    parameters:
+      - name: grantId
+        in: path
+        required: true
+        schema:
+          $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantId
+    post:
+      operationId: renewConsentGrant
+      tags: [ConsentGrants]
+      summary: Renew consent grant expiry
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantRenew
+      responses:
+        '200':
+          description: Renewed
+          content:
+            application/json:
+              schema:
+                $ref: ./consent-grants.schemas.yaml#/components/schemas/ConsentGrantResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

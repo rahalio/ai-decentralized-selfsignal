@@ -1,0 +1,18 @@
+{
+  "name": "@selfsignal/openapi-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenAPI contracts for Selfsignal (common + identity + product domains)",
+  "scripts": {
+    "lint:domains": "redocly lint",
+    "bundle:domains": "mkdir -p src/.bundled && redocly bundle identity --output src/.bundled/identity.openapi.yaml && redocly bundle identity --output src/.bundled/identity.json && redocly bundle vault-profiles --output src/.bundled/vault-profiles.openapi.yaml && redocly bundle vault-profiles --output src/.bundled/vault-profiles.json && redocly bundle purposes --output src/.bundled/purposes.openapi.yaml && redocly bundle purposes --output src/.bundled/purposes.json && redocly bundle consent-grants --output src/.bundled/consent-grants.openapi.yaml && redocly bundle consent-grants --output src/.bundled/consent-grants.json && redocly bundle signal-activations --output src/.bundled/signal-activations.openapi.yaml && redocly bundle signal-activations --output src/.bundled/signal-activations.json && redocly bundle campaigns --output src/.bundled/campaigns.openapi.yaml && redocly bundle campaigns --output src/.bundled/campaigns.json && redocly bundle rights-requests --output src/.bundled/rights-requests.openapi.yaml && redocly bundle rights-requests --output src/.bundled/rights-requests.json && redocly bundle integrations --output src/.bundled/integrations.openapi.yaml && redocly bundle integrations --output src/.bundled/integrations.json && redocly bundle complaint-cases --output src/.bundled/complaint-cases.openapi.yaml && redocly bundle complaint-cases --output src/.bundled/complaint-cases.json && redocly bundle coverage-reports --output src/.bundled/coverage-reports.openapi.yaml && redocly bundle coverage-reports --output src/.bundled/coverage-reports.json && redocly bundle audit-exports --output src/.bundled/audit-exports.openapi.yaml && redocly bundle audit-exports --output src/.bundled/audit-exports.json",
+    "lint": "pnpm run lint:domains",
+    "bundle": "pnpm run bundle:domains"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.34.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

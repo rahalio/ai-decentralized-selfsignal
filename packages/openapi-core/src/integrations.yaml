@@ -1,0 +1,120 @@
+openapi: 3.1.0
+info:
+  title: Integrations API
+  version: 0.1.0
+  description: |
+    Publisher/brand processor-controller registry (BR-5).
+  x-domain: int
+servers:
+  - url: https://api.selfsignal.local
+    description: Local / Selfsignal API
+security:
+  - apiKey: []
+  - bearerJwt: []
+
+tags:
+  - name: Integrations
+    description: Publisher and brand processors
+paths:
+  /v1/integrations:
+    get:
+      operationId: listIntegrations
+      tags: [Integrations]
+      summary: List integrations
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 25
+      - name: role
+        in: query
+        schema:
+          type: string
+          enum: [controller, processor]
+      - name: partyType
+        in: query
+        schema:
+          type: string
+          enum: [publisher, brand, vendor]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./integrations.schemas.yaml#/components/schemas/IntegrationListResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: registerIntegration
+      tags: [Integrations]
+      summary: Register integration
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./integrations.schemas.yaml#/components/schemas/IntegrationCreate
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./integrations.schemas.yaml#/components/schemas/IntegrationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+  /v1/integrations/{integrationId}:
+    parameters:
+      - name: integrationId
+        in: path
+        required: true
+        schema:
+          $ref: ./integrations.schemas.yaml#/components/schemas/IntegrationId
+    get:
+      operationId: getIntegration
+      tags: [Integrations]
+      summary: Get integration
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: ./integrations.schemas.yaml#/components/schemas/IntegrationResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerJwt:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerJwt

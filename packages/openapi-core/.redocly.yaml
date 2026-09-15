@@ -1,0 +1,40 @@
+apis:
+  identity:
+    root: src/identity.yaml
+  vault-profiles:
+    root: src/vault-profiles.yaml
+  purposes:
+    root: src/purposes.yaml
+  consent-grants:
+    root: src/consent-grants.yaml
+  signal-activations:
+    root: src/signal-activations.yaml
+  campaigns:
+    root: src/campaigns.yaml
+  rights-requests:
+    root: src/rights-requests.yaml
+  integrations:
+    root: src/integrations.yaml
+  complaint-cases:
+    root: src/complaint-cases.yaml
+  coverage-reports:
+    root: src/coverage-reports.yaml
+  audit-exports:
+    root: src/audit-exports.yaml
+
+extends:
+  - recommended
+
+rules:
+  no-unused-components: off
+  operation-4xx-response: warn
+  info-license: off
+  info-license-url: off
+  tag-description: off
+  operation-operationId: error
+  no-invalid-media-type-examples: off
+
+theme:
+  openapi:
+    generateCodeSamples:
+      languages: []

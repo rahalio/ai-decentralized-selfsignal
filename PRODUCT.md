@@ -99,7 +99,7 @@ flowchart LR
 
 ## OpenAPI skeleton
 
-Canonical HTTP surface lives in sibling `openapi.yaml`. Summarize here:
+Canonical HTTP surface lives under `packages/openapi-core/src/` (one YAML per domain). Summarize here:
 
 - **Base path:** `/v1/...`
 - **Auth:** API key and/or Bearer JWT (operator)
